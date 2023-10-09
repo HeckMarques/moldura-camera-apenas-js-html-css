@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tirar Foto com Moldura</title>
+    <style>
+        #camera-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 400px;
+            background-color: #f0f0f0;
+            position: relative;
+        }
+
+        #video {
+            border: 10px solid #fff;
+        }
+
+        #frame {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 5px solid #ff0000;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="camera-container">
+        <video id="video" autoplay></video>
+        <canvas id="canvas" style="display: none;"></canvas>
+        <img id="photo">
+        <div id="frame"></div>
+    </div>
+    <button id="capture-button">Tirar Foto</button>
+    
+    <script>
+        // Capturar elementos HTML
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const photo = document.getElementById('photo');
+        const frame = document.getElementById('frame');
+        const captureButton = document.getElementById('capture-button');
+
+        // Acessar a câmera do dispositivo
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function (stream) {
+                video.srcObject = stream;
+            })
+            .catch(function (err) {
+                console.error('Erro ao acessar a câmera: ', err);
+            });
+
+        // Capturar foto
+        captureButton.addEventListener('click', function () {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Exibir a foto capturada sem a moldura
+            photo.src = canvas.toDataURL('image/png');
+            photo.style.display = 'block';
+
+            // Ocultar a moldura
+            frame.style.display = 'none';
+        });
+    </script>
+</body>
+</html>
