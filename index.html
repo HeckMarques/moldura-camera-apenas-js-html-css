@@ -17,17 +17,21 @@
             justify-content: center;
             height: 100vh;
             background-color: #f0f0f0;
+            margin: 5px; 
             position: relative;
         }
 
         #video-container {
             position: relative;
-            margin: 10px; /* Margem para mostrar a moldura verde corretamente */
+            margin-top: 5px;
+            margin-bottom: 5px;
+            transform: scaleX(-1); /* Gira horizontalmente */
         }
 
         #video {
             border: 10px solid #0a0;
             border-radius: 10px;
+            transform: scaleX(-1); /* Gira horizontalmente */
         }
 
         #capture-button {
@@ -75,16 +79,6 @@
             background-color: #0056b3;
         }
 
-        #green-frame {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            right: 10px;
-            bottom: 10px;
-            border: 10px solid #0a0;
-            border-radius: 10px;
-            pointer-events: none;
-        }
     </style>
 </head>
 <body>
@@ -94,7 +88,6 @@
         </div>
         <div id="video-container">
             <video id="video" autoplay></video>
-            <div id="green-frame"></div>
         </div>
         <button id="capture-button">Capturar</button>
         <button id="new-capture-button">Tirar outra foto</button>
@@ -106,7 +99,6 @@
         const captureButton = document.getElementById('capture-button');
         const newCaptureButton = document.getElementById('new-capture-button');
         const cameraSwitch = document.getElementById('camera-switch');
-        const greenFrame = document.getElementById('green-frame');
 
         let currentCameraIndex = 0;
         let cameras = [];
