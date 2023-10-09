@@ -130,6 +130,7 @@
     const cameraSwitch = document.getElementById('camera-switch');
     const photoContainer = document.getElementById('photo-container');
     const capturedPhoto = document.getElementById('captured-photo');
+    const videoContainer = document.getElementById('video-container');
 
     let currentCameraIndex = 0;
     let cameras = [];
@@ -205,7 +206,7 @@
         // Exibir a foto capturada com a moldura
         photo = new Image();
         photo.src = canvas.toDataURL('image/png');
-        photo.style.border = '10px solid #fff';
+        photo.style.border = '10px solid #0a0';
 
         // Substituir o vídeo pela foto capturada e alternar os botões
         videoContainer.style.display = 'none';
@@ -221,8 +222,7 @@
             photo.remove(); // Remover a foto anterior
         }
 
-        const videoContainer = document.getElementById('video-container');
-        videoContainer.style.display = 'block';
+        videoContainer.style.display = 'flex';
         photoContainer.style.display = 'none';
         captureButton.style.display = 'block';
         newCaptureButton.style.display = 'none';
