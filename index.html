@@ -35,36 +35,81 @@
             position: absolute;
             bottom: 20px;
         }
+
+        #camera-switch {
+            margin-top: 20px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div id="camera-container">
         <video id="video" autoplay></video>
         <button id="capture-button">&#128247;</button>
+        <div id="camera-switch"></div>
     </div>
-    
+
     <script>
         // Capturar elementos HTML
         const video = document.getElementById('video');
         const captureButton = document.getElementById('capture-button');
+        const cameraSwitch = document.getElementById('camera-switch');
 
-        // Acessar a câmera traseira do dispositivo
+        let currentCameraIndex = 0;
+        let cameras = [];
+
+        // Função para alternar entre as câmeras disponíveis
+        function switchCamera() {
+            if (cameras.length <= 1) {
+                return; // Não há outras câmeras para alternar
+            }
+            currentCameraIndex = (currentCameraIndex + 1) % cameras.length;
+            startCamera(cameras[currentCameraIndex].deviceId);
+        }
+
+        // Função para solicitar permissão da câmera e começar a transmissão da câmera
+        function startCamera(deviceId) {
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => track.stop());
+            }
+            const constraints = {
+                video: { deviceId: deviceId }
+            };
+            navigator.mediaDevices.getUserMedia(constraints)
+                .then(function (stream) {
+                    video.srcObject = stream;
+                })
+                .catch(function (err) {
+                    console.error('Erro ao acessar a câmera: ', err);
+                });
+        }
+
+        // Obter a lista de dispositivos de vídeo (câmeras)
         navigator.mediaDevices.enumerateDevices()
             .then(function (devices) {
-                let videoDevices = devices.filter(device => device.kind === 'videoinput');
-                if (videoDevices.length > 1) {
-                    // Se houver mais de uma câmera, tente usar a câmera traseira
-                    video.srcObject = { deviceId: videoDevices[1].deviceId };
-                } else if (videoDevices.length > 0) {
-                    // Se houver apenas uma câmera, use-a
-                    video.srcObject = { deviceId: videoDevices[0].deviceId };
+                cameras = devices.filter(device => device.kind === 'videoinput');
+                if (cameras.length > 0) {
+                    startCamera(cameras[currentCameraIndex].deviceId);
+                    if (cameras.length > 1) {
+                        // Se houver mais de uma câmera, exiba a lista de câmeras disponíveis
+                        cameraSwitch.innerHTML = '<strong>Alternar Câmera:</strong> ';
+                        cameras.forEach((camera, index) => {
+                            const button = document.createElement('button');
+                            button.innerText = `Câmera ${index + 1}`;
+                            button.addEventListener('click', () => {
+                                currentCameraIndex = index;
+                                switchCamera();
+                            });
+                            cameraSwitch.appendChild(button);
+                        });
+                    }
                 } else {
                     // Se não houver câmeras disponíveis, exiba uma mensagem de erro
                     console.error('Nenhuma câmera encontrada.');
                 }
             })
             .catch(function (err) {
-                console.error('Erro ao acessar a câmera: ', err);
+                console.error('Erro ao enumerar dispositivos: ', err);
             });
 
         // Capturar foto
