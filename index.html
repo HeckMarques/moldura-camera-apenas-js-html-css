@@ -105,17 +105,6 @@
         .camera-button.active {
             background-color: #0056b3;
         }
-
-        /* Estilos para a área de interesse */
-        #area-de-interesse {
-            position: absolute;
-            top: 10%;
-            left: 10%;
-            width: 80%;
-            height: 80%;
-            border: 2px dashed red; /* Moldura vermelha para a área de interesse */
-            pointer-events: none; /* Evitar interação com a área de interesse */
-        }
     </style>
 </head>
 <body>
@@ -131,8 +120,6 @@
     <div id="photo-container" style="display: none;">
         <img id="captured-photo" src="" alt="Foto Capturada">
     </div>
-    <!-- Adicione a área de interesse -->
-    <div id="area-de-interesse"></div>
 </div>
 
 <script>
@@ -208,43 +195,6 @@
         .catch(function (err) {
             console.error('Erro ao enumerar dispositivos: ', err);
         });
-
-    // Suponha que você tenha as coordenadas do objeto que deseja enquadrar
-    const objetoEnquadrado = {
-        x: 100, // coordenada X do objeto
-        y: 150, // coordenada Y do objeto
-        largura: 50, // largura do objeto
-        altura: 50 // altura do objeto
-    };
-
-    // Verifique se o objeto está dentro da área de interesse
-    function objetoDentroDaArea(objeto, area) {
-        const objetoDireita = objeto.x + objeto.largura;
-        const objetoAbaixo = objeto.y + objeto.altura;
-
-        return (
-            objeto.x >= area.x &&
-            objetoDireita <= area.x + area.largura &&
-            objeto.y >= area.y &&
-            objetoAbaixo <= area.y + area.altura
-        );
-    }
-
-    // Função para verificar se o objeto está dentro da área de interesse e acionar a captura
-    function verificarCapturaAutomatica() {
-        const areaDeInteresse = document.getElementById('area-de-interesse');
-        const capturarAutomaticamente = objetoDentroDaArea(objetoEnquadrado, areaDeInteresse);
-
-        if (capturarAutomaticamente) {
-            captureButton.click();
-        }
-
-        // Chame esta função continuamente usando um temporizador
-        requestAnimationFrame(verificarCapturaAutomatica);
-    }
-
-    // Inicie a verificação automática
-    verificarCapturaAutomatica();
 
     // Capturar foto
     captureButton.addEventListener('click', function () {
