@@ -22,6 +22,7 @@
 
         #video-container {
             position: relative;
+            margin: 10px; /* Margem para mostrar a moldura verde corretamente */
         }
 
         #video {
@@ -52,6 +53,7 @@
             padding: 10px 20px;
             margin-top: 10px;
             cursor: pointer;
+            display: none; /* Inicialmente oculto */
         }
 
         #camera-switch {
@@ -95,7 +97,7 @@
             <div id="green-frame"></div>
         </div>
         <button id="capture-button">Capturar</button>
-        <button id="new-capture-button" style="display: none;">Tirar outra foto</button>
+        <button id="new-capture-button">Tirar outra foto</button>
     </div>
 
     <script>
@@ -108,6 +110,7 @@
 
         let currentCameraIndex = 0;
         let cameras = [];
+        let photo = null;
 
         // Função para alternar entre as câmeras disponíveis
         function switchCamera(index) {
@@ -177,9 +180,8 @@
             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
 
             // Exibir a foto capturada com a moldura
-            const photoURL = canvas.toDataURL('image/png');
-            const photo = new Image();
-            photo.src = photoURL;
+            photo = new Image();
+            photo.src = canvas.toDataURL('image/png');
             photo.style.border = '10px solid #fff';
 
             // Substituir o vídeo pela foto capturada e alternar os botões
@@ -193,9 +195,12 @@
 
         // Tirar outra foto
         newCaptureButton.addEventListener('click', function () {
+            if (photo) {
+                photo.remove(); // Remover a foto anterior
+            }
+
             const videoContainer = document.getElementById('video-container');
             videoContainer.style.display = 'block';
-            videoContainer.parentElement.removeChild(videoContainer.nextSibling);
             captureButton.style.display = 'block';
             newCaptureButton.style.display = 'none';
             greenFrame.style.display = 'block';
