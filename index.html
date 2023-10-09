@@ -20,10 +20,13 @@
             position: relative;
         }
 
+        #video-container {
+            position: relative;
+        }
+
         #video {
-            border: 10px solid #fff;
+            border: 10px solid #0a0;
             border-radius: 10px;
-            margin-bottom: 20px;
         }
 
         #capture-button {
@@ -37,6 +40,8 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
+            transition: opacity 0.3s;
+            margin-top: 10px;
         }
 
         #camera-switch {
@@ -61,11 +66,14 @@
 </head>
 <body>
     <div id="camera-container">
+        <div id="video-container">
+            <video id="video" autoplay></video>
+            <div id="green-frame"></div>
+        </div>
+        <button id="capture-button">Capturar</button>
         <div id="camera-switch">
             <!-- Botões de seleção de câmera -->
         </div>
-        <video id="video" autoplay></video>
-        <button id="capture-button">Capturar</button>
     </div>
 
     <script>
@@ -73,6 +81,7 @@
         const video = document.getElementById('video');
         const captureButton = document.getElementById('capture-button');
         const cameraSwitch = document.getElementById('camera-switch');
+        const greenFrame = document.getElementById('green-frame');
 
         let currentCameraIndex = 0;
         let cameras = [];
@@ -150,10 +159,14 @@
             photo.src = photoURL;
             photo.style.border = '10px solid #fff';
 
-            // Substituir o vídeo pela foto capturada
+            // Substituir o vídeo pela foto capturada e ocultar o botão de captura
             const cameraContainer = document.getElementById('camera-container');
-            cameraContainer.removeChild(video);
+            const videoContainer = document.getElementById('video-container');
+            videoContainer.style.display = 'none';
+            cameraContainer.removeChild(videoContainer);
             cameraContainer.appendChild(photo);
+            captureButton.style.display = 'none';
+            greenFrame.style.display = 'none';
         });
     </script>
 </body>
