@@ -44,6 +44,16 @@
             margin-top: 10px;
         }
 
+        #new-capture-button {
+            background-color: #000;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
         #camera-switch {
             display: flex;
             margin-top: 10px;
@@ -85,12 +95,14 @@
             <div id="green-frame"></div>
         </div>
         <button id="capture-button">Capturar</button>
+        <button id="new-capture-button" style="display: none;">Tirar outra foto</button>
     </div>
 
     <script>
         // Capturar elementos HTML
         const video = document.getElementById('video');
         const captureButton = document.getElementById('capture-button');
+        const newCaptureButton = document.getElementById('new-capture-button');
         const cameraSwitch = document.getElementById('camera-switch');
         const greenFrame = document.getElementById('green-frame');
 
@@ -164,20 +176,29 @@
             canvas.height = video.videoHeight;
             canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Exibir a foto capturada sem a moldura
+            // Exibir a foto capturada com a moldura
             const photoURL = canvas.toDataURL('image/png');
             const photo = new Image();
             photo.src = photoURL;
             photo.style.border = '10px solid #fff';
 
-            // Substituir o vídeo pela foto capturada e ocultar o botão de captura
-            const cameraContainer = document.getElementById('camera-container');
+            // Substituir o vídeo pela foto capturada e alternar os botões
             const videoContainer = document.getElementById('video-container');
             videoContainer.style.display = 'none';
-            cameraContainer.removeChild(videoContainer);
-            cameraContainer.appendChild(photo);
+            videoContainer.parentElement.appendChild(photo);
             captureButton.style.display = 'none';
+            newCaptureButton.style.display = 'block';
             greenFrame.style.display = 'none';
+        });
+
+        // Tirar outra foto
+        newCaptureButton.addEventListener('click', function () {
+            const videoContainer = document.getElementById('video-container');
+            videoContainer.style.display = 'block';
+            videoContainer.parentElement.removeChild(videoContainer.nextSibling);
+            captureButton.style.display = 'block';
+            newCaptureButton.style.display = 'none';
+            greenFrame.style.display = 'block';
         });
     </script>
 </body>
