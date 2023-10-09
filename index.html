@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tirar Foto com Moldura</title>
     <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
         #camera-container {
             display: flex;
             flex-direction: column;
@@ -26,27 +31,41 @@
             color: #fff;
             border: none;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 80px;
+            height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            position: absolute;
-            bottom: 20px;
         }
 
         #camera-switch {
-            margin-top: 20px;
+            margin-bottom: 10px;
+            display: flex;
+        }
+
+        .camera-button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            margin-right: 10px;
             cursor: pointer;
+        }
+
+        .camera-button.active {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
     <div id="camera-container">
+        <div id="camera-switch">
+            <!-- Botões de seleção de câmera -->
+        </div>
         <video id="video" autoplay></video>
-        <button id="capture-button">&#128247;</button>
-        <div id="camera-switch"></div>
+        <button id="capture-button">Capturar</button>
     </div>
 
     <script>
@@ -59,12 +78,22 @@
         let cameras = [];
 
         // Função para alternar entre as câmeras disponíveis
-        function switchCamera() {
-            if (cameras.length <= 1) {
-                return; // Não há outras câmeras para alternar
-            }
-            currentCameraIndex = (currentCameraIndex + 1) % cameras.length;
+        function switchCamera(index) {
+            currentCameraIndex = index;
             startCamera(cameras[currentCameraIndex].deviceId);
+            updateCameraButtons();
+        }
+
+        // Função para atualizar a aparência dos botões de câmera
+        function updateCameraButtons() {
+            const buttons = document.querySelectorAll('.camera-button');
+            buttons.forEach((button, index) => {
+                if (index === currentCameraIndex) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
         }
 
         // Função para solicitar permissão da câmera e começar a transmissão da câmera
@@ -89,20 +118,16 @@
             .then(function (devices) {
                 cameras = devices.filter(device => device.kind === 'videoinput');
                 if (cameras.length > 0) {
-                    startCamera(cameras[currentCameraIndex].deviceId);
-                    if (cameras.length > 1) {
-                        // Se houver mais de uma câmera, exiba a lista de câmeras disponíveis
-                        cameraSwitch.innerHTML = '<strong>Alternar Câmera:</strong> ';
-                        cameras.forEach((camera, index) => {
-                            const button = document.createElement('button');
-                            button.innerText = `Câmera ${index + 1}`;
-                            button.addEventListener('click', () => {
-                                currentCameraIndex = index;
-                                switchCamera();
-                            });
-                            cameraSwitch.appendChild(button);
+                    cameras.forEach((camera, index) => {
+                        const button = document.createElement('button');
+                        button.className = 'camera-button';
+                        button.innerText = `Câmera ${index + 1}`;
+                        button.addEventListener('click', () => {
+                            switchCamera(index);
                         });
-                    }
+                        cameraSwitch.appendChild(button);
+                    });
+                    switchCamera(0); // Iniciar com a primeira câmera por padrão
                 } else {
                     // Se não houver câmeras disponíveis, exiba uma mensagem de erro
                     console.error('Nenhuma câmera encontrada.');
