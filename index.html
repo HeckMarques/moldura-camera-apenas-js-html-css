@@ -105,6 +105,13 @@
         .camera-button.active {
             background-color: #0056b3;
         }
+
+        #timer {
+            font-size: 36px;
+            font-weight: bold;
+            color: red;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -114,15 +121,40 @@
     </div>
     <div id="video-container">
         <video id="video" autoplay></video>
+        <div id="timer">Enquadre o documento na moldura</div>
     </div>
-    <button id="capture-button">Capturar</button>
-    <button id="new-capture-button">Tirar outra foto</button>
     <div id="photo-container" style="display: none;">
         <img id="captured-photo" src="" alt="Foto Capturada">
     </div>
+    <button id="new-capture-button">Tirar outra foto</button>
 </div>
 
 <script>
+
+    let countdown = 5;
+    let countdownInterval;
+
+    function startCountdown() {
+        const timerElement = document.getElementById('timer');
+        timerElement.style.display = 'block';
+
+        function updateTimer() {
+            timerElement.innerText = `Enquadre o documento na moldura ${countdown}`;
+        }
+
+        updateTimer();
+
+        countdownInterval = setInterval(() => {
+            countdown -= 1;
+            updateTimer();
+
+            if (countdown === 0) {
+                clearInterval(countdownInterval);
+                capturePhoto();
+            }
+        }, 1000);
+    }
+
     // Capturar elementos HTML
     const video = document.getElementById('video');
     const captureButton = document.getElementById('capture-button');
@@ -195,6 +227,34 @@
         .catch(function (err) {
             console.error('Erro ao enumerar dispositivos: ', err);
         });
+
+    // Coloque a última câmera encontrada como padrão
+    window.addEventListener('DOMContentLoaded', () => {
+        navigator.mediaDevices.enumerateDevices()
+            .then(function (devices) {
+                cameras = devices.filter(device => device.kind === 'videoinput');
+                if (cameras.length > 0) {
+                    switchCamera(cameras.length - 1); // Defina a última câmera como padrão
+                    cameras.forEach((camera, index) => {
+                        const button = document.createElement('button');
+                        button.className = 'camera-button';
+                        button.innerText = `Câmera ${index + 1}`;
+                        button.addEventListener('click', () => {
+                            switchCamera(index);
+                        });
+                        cameraSwitch.appendChild(button);
+                    });
+                } else {
+                    // Se não houver câmeras disponíveis, exiba uma mensagem de erro
+                    console.error('Nenhuma câmera encontrada.');
+                }
+            })
+            .catch(function (err) {
+                console.error('Erro ao enumerar dispositivos: ', err);
+            });
+
+        startCountdown();
+    });
 
     // Capturar foto
     captureButton.addEventListener('click', function () {
