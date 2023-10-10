@@ -86,9 +86,9 @@
 </head>
 <body>
 <div id="camera-container">
+    <h1 id="timer-container">Enquadre o documento</h1>
     <div id="video-container" style="position: relative;">
         <video id="video" autoplay></video>
-        <div id="timer-container">Enquadre o documento, tirando foto em <span id="timer">5</span></div>
     </div>
     <div id="photo-container" style="display: none;">
         <img id="captured-photo" src="" alt="Foto Capturada">
@@ -102,12 +102,11 @@
     let countdownInterval;
 
     function startCountdown() {
-        const timerElement = document.getElementById('timer');
-        const timerContainer = document.getElementById('timer-container');
-        timerContainer.style.display = 'block';
+        const timerElement = document.getElementById('timer-container');
+        timerElement.style.display = 'block';
 
         function updateTimer() {
-            timerElement.innerText = countdown;
+            timerElement.innerText = `Enquadre o documento, tirando foto em ${countdown}`;
         }
 
         updateTimer();
@@ -134,11 +133,11 @@
     function startCamera() {
         navigator.mediaDevices.enumerateDevices()
             .then(function (devices) {
-                const rearCamera = devices.find(device => device.kind === 'videoinput' && device.label.toLowerCase().includes('back'));
-                if (rearCamera) {
+                const rearCameras = devices.filter(device => device.kind === 'videoinput' && device.label.toLowerCase().includes('back'));
+                if (rearCameras.length > 0) {
                     const constraints = {
                         video: {
-                            deviceId: rearCamera.deviceId
+                            deviceId: rearCameras[rearCameras.length - 1].deviceId
                         }
                     };
                     return navigator.mediaDevices.getUserMedia(constraints);
@@ -155,7 +154,7 @@
             });
     }
 
-    // Coloque a última câmera encontrada como padrão
+    // Coloque a última câmera traseira como padrão
     window.addEventListener('DOMContentLoaded', () => {
         startCamera();
         startCountdown();
