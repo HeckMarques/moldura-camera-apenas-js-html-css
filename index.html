@@ -42,30 +42,15 @@
             transform: scaleX(-1); /* Gira horizontalmente */
         }
 
-        #capture-button {
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 50%;
-            width: 80px;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: opacity 0.3s;
-            margin-top: 10px;
-        }
-
-        #new-capture-button {
-            background-color: #000;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            margin-top: 10px;
-            cursor: pointer;
-            display: none; /* Inicialmente oculto */
+        #timer-container {
+            font-size: 24px;
+            font-weight: bold;
+            color: red;
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
         }
 
         #photo-container {
@@ -87,45 +72,23 @@
             border-radius: 10px;
         }
 
-        #camera-switch {
-            display: flex;
-            margin-top: 10px;
-        }
-
-        .camera-button {
-            background-color: #007bff;
+        #new-capture-button {
+            background-color: #000;
             color: #fff;
             border: none;
             border-radius: 5px;
-            padding: 5px 10px;
-            margin-right: 10px;
+            padding: 10px 20px;
+            margin-top: 10px;
             cursor: pointer;
-        }
-
-        .camera-button.active {
-            background-color: #0056b3;
-        }
-
-        #timer {
-            font-size: 36px;
-            font-weight: bold;
-            color: red;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: none;
+            display: none; /* Inicialmente oculto */
         }
     </style>
 </head>
 <body>
 <div id="camera-container">
-    <div id="camera-switch">
-        <!-- Botões de seleção de câmera -->
-    </div>
     <div id="video-container" style="position: relative;">
         <video id="video" autoplay></video>
-        <div id="timer">Enquadre o documento na moldura</div>
+        <div id="timer-container">Enquadre o documento, tirando foto em <span id="timer">5</span></div>
     </div>
     <div id="photo-container" style="display: none;">
         <img id="captured-photo" src="" alt="Foto Capturada">
@@ -140,10 +103,11 @@
 
     function startCountdown() {
         const timerElement = document.getElementById('timer');
-        timerElement.style.display = 'block';
+        const timerContainer = document.getElementById('timer-container');
+        timerContainer.style.display = 'block';
 
         function updateTimer() {
-            timerElement.innerText = `${countdown}`;
+            timerElement.innerText = countdown;
         }
 
         updateTimer();
@@ -161,45 +125,14 @@
 
     // Capturar elementos HTML
     const video = document.getElementById('video');
-    const captureButton = document.getElementById('capture-button');
     const newCaptureButton = document.getElementById('new-capture-button');
-    const cameraSwitch = document.getElementById('camera-switch');
     const photoContainer = document.getElementById('photo-container');
     const capturedPhoto = document.getElementById('captured-photo');
     const videoContainer = document.getElementById('video-container');
 
-    let currentCameraIndex = 0;
-    let cameras = [];
-    let photo = null;
-
-    // Função para alternar entre as câmeras disponíveis
-    function switchCamera(index) {
-        currentCameraIndex = index;
-        startCamera(cameras[currentCameraIndex].deviceId);
-        updateCameraButtons();
-    }
-
-    // Função para atualizar a aparência dos botões de câmera
-    function updateCameraButtons() {
-        const buttons = document.querySelectorAll('.camera-button');
-        buttons.forEach((button, index) => {
-            if (index === currentCameraIndex) {
-                button.classList.add('active');
-            } else {
-                button.classList.remove('active');
-            }
-        });
-    }
-
     // Função para solicitar permissão da câmera e começar a transmissão da câmera
-    function startCamera(deviceId) {
-        if (video.srcObject) {
-            video.srcObject.getTracks().forEach(track => track.stop());
-        }
-        const constraints = {
-            video: { deviceId: deviceId }
-        };
-        navigator.mediaDevices.getUserMedia(constraints)
+    function startCamera() {
+        navigator.mediaDevices.getUserMedia({ video: true })
             .then(function (stream) {
                 video.srcObject = stream;
             })
@@ -208,46 +141,9 @@
             });
     }
 
-    // Obter as quatro primeiras câmeras disponíveis
-    navigator.mediaDevices.enumerateDevices()
-        .then(function (devices) {
-            cameras = devices.filter(device => device.kind === 'videoinput');
-            if (cameras.length > 0) {
-                cameras.slice(0, 4).forEach((camera, index) => {
-                    const button = document.createElement('button');
-                    button.className = 'camera-button';
-                    button.innerText = `Câmera ${index + 1}`;
-                    button.addEventListener('click', () => {
-                        switchCamera(index);
-                    });
-                    cameraSwitch.appendChild(button);
-                });
-                switchCamera(0); // Iniciar com a primeira câmera por padrão
-            } else {
-                // Se não houver câmeras disponíveis, exiba uma mensagem de erro
-                console.error('Nenhuma câmera encontrada.');
-            }
-        })
-        .catch(function (err) {
-            console.error('Erro ao enumerar dispositivos: ', err);
-        });
-
     // Coloque a última câmera encontrada como padrão
     window.addEventListener('DOMContentLoaded', () => {
-        navigator.mediaDevices.enumerateDevices()
-            .then(function (devices) {
-                cameras = devices.filter(device => device.kind === 'videoinput');
-                if (cameras.length > 0) {
-                    switchCamera(cameras.length - 1); // Defina a última câmera como padrão
-                } else {
-                    // Se não houver câmeras disponíveis, exiba uma mensagem de erro
-                    console.error('Nenhuma câmera encontrada.');
-                }
-            })
-            .catch(function (err) {
-                console.error('Erro ao enumerar dispositivos: ', err);
-            });
-
+        startCamera();
         startCountdown();
     });
 
@@ -259,7 +155,7 @@
         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
 
         // Exibir a foto capturada com a moldura
-        photo = new Image();
+        const photo = new Image();
         photo.src = canvas.toDataURL('image/png');
         photo.style.border = '10px solid #0a0';
 
@@ -272,16 +168,12 @@
 
     // Tirar outra foto
     newCaptureButton.addEventListener('click', function () {
-        if (photo) {
-            photo.remove(); // Remover a foto anterior
-        }
+        countdown = 5; // Reinicie o contador
+        startCountdown(); // Iniciar a contagem regressiva novamente
 
         videoContainer.style.display = 'flex';
         photoContainer.style.display = 'none';
         newCaptureButton.style.display = 'none';
-
-        countdown = 5; // Reinicie o contador
-        startCountdown(); // Iniciar a contagem regressiva novamente
     });
 </script>
 </body>
