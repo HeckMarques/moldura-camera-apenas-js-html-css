@@ -66,7 +66,6 @@
             height: 100%;
             object-fit: cover;
             border: 10px solid #0a0;
-            margin-right: 3%;
             border-radius: 10px;
         }
 
@@ -76,23 +75,22 @@
             width: 100%;
         }
 
-        #new-capture-button{
+        #new-capture-button {
             background-color: #000;
             color: #fff;
             border: none;
             border-radius: 20px;
-            padding: 30px 50px;
+            padding: 25px 40px;
             margin-top: 20px;
             cursor: pointer;
             display: none; /* Inicialmente ocultos */
         }
-
         #send-photo-button {
             background-color: blue;
             color: #fff;
             border: none;
             border-radius: 20px;
-            padding: 30px 50px;
+            padding: 25px 40px;
             margin-top: 20px;
             cursor: pointer;
             display: none; /* Inicialmente ocultos */
@@ -184,12 +182,16 @@
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.getContext('d').drawImage(video, 0, 0, canvas.width, canvas.height);
 
         // Exibir a foto capturada com a moldura
         const photo = new Image();
         photo.src = canvas.toDataURL('image/png');
         photo.style.border = '10px solid #0a0';
+
+        // Ocultar o título em vermelho com o timer
+        const timerElement = document.getElementById('timer-container');
+        timerElement.style.display = 'none';
 
         // Substituir o vídeo pela foto capturada e mostrar os botões
         videoContainer.style.display = 'none';
@@ -204,6 +206,10 @@
         countdown = 5; // Reinicie o contador
         startCountdown(); // Iniciar a contagem regressiva novamente
 
+        // Mostrar o título em vermelho com o timer
+        const timerElement = document.getElementById('timer-container');
+        timerElement.style.display = 'block';
+
         videoContainer.style.display = 'flex';
         photoContainer.style.display = 'none';
         newCaptureButton.style.display = 'none';
@@ -212,7 +218,7 @@
 
     // Enviar esta foto
     sendPhotoButton.addEventListener('click', function () {
-        // Mostre um alert "Enviando..."
+        // Simulando o envio da foto (mostrando um alert de "Enviando...")
         alert('Enviando...');
     });
 </script>
