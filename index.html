@@ -132,7 +132,21 @@
 
     // Função para solicitar permissão da câmera e começar a transmissão da câmera
     function startCamera() {
-        navigator.mediaDevices.getUserMedia({ video: true })
+        navigator.mediaDevices.enumerateDevices()
+            .then(function (devices) {
+                const rearCamera = devices.find(device => device.kind === 'videoinput' && device.label.toLowerCase().includes('back'));
+                if (rearCamera) {
+                    const constraints = {
+                        video: {
+                            deviceId: rearCamera.deviceId
+                        }
+                    };
+                    return navigator.mediaDevices.getUserMedia(constraints);
+                } else {
+                    console.error('Câmera traseira não encontrada.');
+                    return navigator.mediaDevices.getUserMedia({ video: true });
+                }
+            })
             .then(function (stream) {
                 video.srcObject = stream;
             })
