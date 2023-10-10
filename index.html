@@ -110,6 +110,10 @@
             font-size: 36px;
             font-weight: bold;
             color: red;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             display: none;
         }
     </style>
@@ -119,7 +123,7 @@
     <div id="camera-switch">
         <!-- Botões de seleção de câmera -->
     </div>
-    <div id="video-container">
+    <div id="video-container" style="position: relative;">
         <video id="video" autoplay></video>
         <div id="timer">Enquadre o documento na moldura</div>
     </div>
@@ -204,12 +208,12 @@
             });
     }
 
-    // Obter a lista de dispositivos de vídeo (câmeras)
+    // Obter as quatro primeiras câmeras disponíveis
     navigator.mediaDevices.enumerateDevices()
         .then(function (devices) {
             cameras = devices.filter(device => device.kind === 'videoinput');
             if (cameras.length > 0) {
-                cameras.forEach((camera, index) => {
+                cameras.slice(0, 4).forEach((camera, index) => {
                     const button = document.createElement('button');
                     button.className = 'camera-button';
                     button.innerText = `Câmera ${index + 1}`;
@@ -235,15 +239,6 @@
                 cameras = devices.filter(device => device.kind === 'videoinput');
                 if (cameras.length > 0) {
                     switchCamera(cameras.length - 1); // Defina a última câmera como padrão
-                    cameras.forEach((camera, index) => {
-                        const button = document.createElement('button');
-                        button.className = 'camera-button';
-                        button.innerText = `Câmera ${index + 1}`;
-                        button.addEventListener('click', () => {
-                            switchCamera(index);
-                        });
-                        cameraSwitch.appendChild(button);
-                    });
                 } else {
                     // Se não houver câmeras disponíveis, exiba uma mensagem de erro
                     console.error('Nenhuma câmera encontrada.');
@@ -256,8 +251,8 @@
         startCountdown();
     });
 
-    // Capturar foto
-    captureButton.addEventListener('click', function () {
+    // Função para tirar uma foto
+    function capturePhoto() {
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
@@ -272,9 +267,8 @@
         videoContainer.style.display = 'none';
         photoContainer.style.display = 'block';
         capturedPhoto.src = photo.src;
-        captureButton.style.display = 'none';
         newCaptureButton.style.display = 'block';
-    });
+    }
 
     // Tirar outra foto
     newCaptureButton.addEventListener('click', function () {
@@ -284,8 +278,10 @@
 
         videoContainer.style.display = 'flex';
         photoContainer.style.display = 'none';
-        captureButton.style.display = 'block';
         newCaptureButton.style.display = 'none';
+
+        countdown = 5; // Reinicie o contador
+        startCountdown(); // Iniciar a contagem regressiva novamente
     });
 </script>
 </body>
