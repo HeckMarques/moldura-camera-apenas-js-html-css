@@ -75,7 +75,7 @@
             width: 100%;
         }
 
-        #new-capture-button {
+        #new-capture-button{
             background-color: #000;
             color: #fff;
             border: none;
@@ -85,6 +85,7 @@
             cursor: pointer;
             display: none; /* Inicialmente ocultos */
         }
+
         #send-photo-button {
             background-color: blue;
             color: #fff;
@@ -182,7 +183,7 @@
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-        canvas.getContext('d').drawImage(video, 0, 0, canvas.width, canvas.height);
+        canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
 
         // Exibir a foto capturada com a moldura
         const photo = new Image();
