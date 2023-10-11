@@ -20,7 +20,7 @@ Você pode experimentar a aplicação online acessando o seguinte link:
 
 ## Imagem da Aplicação em Funcionamento
 
-![Moldura da Câmera](imagem_demo.jpeg)
+![Moldura da Câmera](imagem_demo.jpg)
 
 ## Autor
 
